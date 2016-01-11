@@ -1,10 +1,22 @@
 Images = new Mongo.Collection("images");
-console.log(Images.find().count());
 
 if (Meteor.isClient) {
+    
+    Accounts.ui.config({
+        passwordSignupFields: "USERNAME_AND_EMAIL"
+    });
 
     Template.images.helpers({images: 
         Images.find({}, {sort:{cratedOn:-1, rating:-1}})
+    });
+    
+    Template.body.helpers({username: function(){
+        if(Meteor.user()){
+            return  Meteor.user().username;
+        } else {
+            return "Guest";
+        }
+    }
     });
     
     Template.images.events({
@@ -33,7 +45,6 @@ if (Meteor.isClient) {
             var image_src, image_alt;
             image_src = event.target.img_src.value;
             image_alt = event.target.img_alt.value;
-            console.log('src: '+image_src+" alt: "+image_alt);
             
             Images.insert(
                 {

@@ -1,8 +1,8 @@
-//initiate Images collection
-Images = new Mongo.Collection("images");
+//initiate websites collection
+Websites = new Mongo.Collection("websites");
 
 //set up security 
-Images.allow({
+Websites.allow({
     insert:function(userId, doc){
         if(Meteor.user()){
             if(userId != doc.createdBy){
@@ -11,6 +11,10 @@ Images.allow({
                 return true;
             }
         }
+    },
+    
+    update:function(userId, doc){
+        return true;
     },
     
     remove:function(userId, doc){ 

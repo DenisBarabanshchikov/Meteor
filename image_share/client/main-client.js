@@ -13,6 +13,9 @@ Router.route('/images', function () {
   this.render('navbar', {
     to: "navbar"
   });
+  this.render('image_add_form', {
+    to: "head"
+  });
   this.render('images', {
     to: "main"
   });

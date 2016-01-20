@@ -1,4 +1,36 @@
 if (Meteor.isClient) {
+    
+    /// routing
+    Router.configure({
+       layoutTemplate: 'ApplicationLayout' 
+    });
+
+    Router.route('/', function () {
+      this.render('navbar', {
+        to: "navbar"
+      });
+      this.render('website_list', {
+        to: "main"
+      });
+    });  
+    
+    Router.route('/website/:_id', function () {
+      this.render('navbar', {
+        to: "navbar"
+      });
+      this.render('website_detail', {
+        to: "main",
+        data:function(){
+            return Websites.findOne({_id:this.params._id});
+        }
+      });
+    }); 
+    
+    /// acounts config
+    Accounts.ui.config({
+        passwordSignupFields: "USERNAME_AND_EMAIL"
+    });
+
 
 	/////
 	// template helpers 
@@ -10,11 +42,25 @@ if (Meteor.isClient) {
 			return Websites.find({}, {sort:{voteup:-1}});
 		}
 	});
-	Template.website_item.helpers({
-        getFormatDate: function(date){
-            return moment(date).format('MM-DD-YYYY');
-        }
+	Template.website_detail.helpers({
+		comments: function(){
+			return Comments.find({post_id:this._id});
+		}
 	});
+    
+    Template.registerHelper('formatDate', function(date) {
+      return moment(date).format('MM-DD-YYYY');
+    });
+    
+    Template.registerHelper('getUser', function(user_id) {
+        var user = Meteor.users.findOne({_id:user_id});
+        if(user){
+            return user.username;
+        } else {
+            return "anonymous";
+        }
+    });
+
 
 
 	/////
@@ -67,13 +113,13 @@ if (Meteor.isClient) {
 			$("#website_form").toggle('slow');
 		}, 
 		"submit .js-save-website-form":function(event){
-
+		  
 			// here is an example of how to get the url out of the form:
 			var url = event.target.url.value;
             var title = event.target.title.value;
             var description = event.target.description.value;
             
-            if(Meteor.user() && url.length() && title.length() && description.length()){
+            if(Meteor.user() && url.length && title.length && description.length){
                 Websites.insert(
                     {
                     url:url,
@@ -93,6 +139,28 @@ if (Meteor.isClient) {
 
 		}
 	});
+    
+    Template.comment_form.events({
+        "submit .js-comment-website-form":function(event){
+            var comment = event.target.comment.value;
+            var post_id = event.target.post_id.value;
+            
+            if(Meteor.user() && comment.length && post_id.length){
+                Comments.insert(
+                    {
+                    post_id:post_id,
+                    comment:comment,
+                    createdOn:new Date(),
+                    createdBy:Meteor.user()._id
+                    }
+                );
+            }
+            
+            event.target.comment.value = '';
+            
+            return false;
+        }
+    });
 }
 
 

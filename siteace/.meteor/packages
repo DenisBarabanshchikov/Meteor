@@ -21,3 +21,6 @@ twbs:bootstrap
 accounts-ui
 accounts-password
 momentjs:moment
+iron:router
+aldeed:http
+http
